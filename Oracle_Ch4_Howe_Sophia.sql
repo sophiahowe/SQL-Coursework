@@ -1,0 +1,62 @@
+-- Oracle SQL, chapter 4
+-- BMIS 441-02 Data Base Management
+-- Sophia Howe
+-- Row: 0
+
+
+-- #1
+CREATE TABLE store_reps 
+(rep_ID NUMBER (5) PRIMARY KEY, 
+last VARCHAR2 (15), 
+first VARCHAR2 (10), 
+comm CHAR (1) DEFAULT 'Y');
+
+-- #2
+ALTER TABLE store_reps MODIFY last NOT NULL;
+ALTER TABLE store_reps MODIFY first NOT NULL;
+
+-- #3
+ALTER TABLE store_reps 
+ADD CONSTRAINT store_reps_comm_ck 
+CHECK (comm IN ('Y', 'N'));
+
+-- #4
+ALTER TABLE store_reps 
+ADD (Base_salary NUMBER (7,2) 
+CONSTRAINT store_reps_Base_salary_ck 
+CHECK (Base_salary > 0));
+
+-- #5
+CREATE TABLE BOOK_STORES
+(Store_ID NUMBER (8) PRIMARY KEY, 
+Name VARCHAR2 (30) NOT NULL,
+Contact VARCHAR2 (30), 
+Rep_ID VARCHAR2 (5),
+CONSTRAINT BOOK_STORES_Name_uk UNIQUE (Name));
+
+-- #6
+ALTER TABLE BOOK_STORES
+MODIFY (Rep_ID NUMBER (5))
+ADD CONSTRAINT BOOK_STORES_ID_fk FOREIGN KEY(Rep_ID)
+REFERENCES store_reps (Rep_ID);
+
+-- #7
+ALTER TABLE BOOK_STORES 
+DROP CONSTRAINT BOOK_STORES_ID_fk;
+
+ALTER TABLE BOOK_STORES
+MODIFY (Rep_ID NUMBER (5))
+ADD CONSTRAINT BOOK_STORES_ID_fk FOREIGN KEY (Rep_ID)
+REFERENCES store_reps (Rep_ID) ON DELETE CASCADE;
+
+-- #8
+CREATE TABLE REP_CONTRACTS
+(Store_ID NUMBER (8),
+Name NUMBER (5),
+Quarter CHAR (3),
+Rep_ID NUMBER (5),
+CONSTRAINT REP_CONTRACTS_pk PRIMARY KEY (Rep_ID, Store_ID, Quarter),
+CONSTRAINT REP_CONTRACTS_Store_ID_fk FOREIGN KEY (Store_ID)
+REFERENCES BOOK_STORES (Store_ID),
+CONSTRAINT REP_CONTRACTS_Rep_ID_fk FOREIGN KEY (Rep_ID)
+REFERENCES store_reps (Rep_ID));
